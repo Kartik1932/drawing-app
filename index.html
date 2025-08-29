@@ -38,6 +38,8 @@
         <label>Brush Size: <input type="range" id="brushSize" min="1" max="30"></label>
         <button id="brushBtn" class="active">Brush</button>
         <button id="eraserBtn">Eraser</button>
+        <button id="undoBtn">Undo</button>
+        <button id="redoBtn">Redo</button>
         <button id="clearBtn">Clear</button>
         <button id="saveBtn">Save</button>
     </div>
@@ -51,6 +53,8 @@
         const brushSize = document.getElementById("brushSize");
         const brushBtn = document.getElementById("brushBtn");
         const eraserBtn = document.getElementById("eraserBtn");
+        const undoBtn = document.getElementById("undoBtn");
+        const redoBtn = document.getElementById("redoBtn");
         const clearBtn = document.getElementById("clearBtn");
         const saveBtn = document.getElementById("saveBtn");
 
@@ -61,7 +65,20 @@
         let isDrawing = false;
         let isErasing = false;
 
-        canvas.addEventListener("mousedown", () => isDrawing = true);
+        let undoStack = [];
+        let redoStack = [];
+
+        function saveState() {
+            undoStack.push(canvas.toDataURL());
+            redoStack = [];
+        }
+
+
+        canvas.addEventListener("mousedown", (e)=>{
+            isDrawing = true;
+            saveState();
+            draw(e);
+        })
         canvas.addEventListener("mouseup", () =>{ isDrawing = false; ctx.beginPath(); });
         canvas.addEventListener("mouseout", () => isDrawing = false);
 
@@ -101,6 +118,32 @@
             isErasing = true;
             eraserBtn.classList.add("active");
             brushBtn.classList.remove("active");
+        })
+
+        undoBtn.addEventListener("click", ()=>{
+            if(undoStack.length > 0) {
+                redoStack.push(canvas.toDataURL());
+                let lastState = undoStack.pop();
+                let img = new Image();
+                img.src = lastState;
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                }
+            }
+        })
+
+        redoBtn.addEventListener("click", ()=>{
+            if(redoStack.length > 0){
+                undoStack.push(canvas.toDataURL());
+                let nextState = redoStack.pop();
+                let img = new Image();
+                img.src = nextState;
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                }
+            }
         })
 
         clearBtn.addEventListener("click", ()=>{
