@@ -25,12 +25,19 @@
             background: white;
             cursor: crosshair;
         }
+
+        .active{
+            background: #ddd;
+            border: 1px solid #333;
+        }
     </style>
 </head>
 <body>
     <div id="toolbar">
         <label>Color: <input type="color" id="colorPicker" value="#000000"></label>
         <label>Brush Size: <input type="range" id="brushSize" min="1" max="30"></label>
+        <button id="brushBtn" class="active">Brush</button>
+        <button id="eraserBtn">Eraser</button>
         <button id="clearBtn">Clear</button>
         <button id="saveBtn">Save</button>
     </div>
@@ -42,6 +49,8 @@
 
         const colorPicker = document.getElementById("colorPicker");
         const brushSize = document.getElementById("brushSize");
+        const brushBtn = document.getElementById("brushBtn");
+        const eraserBtn = document.getElementById("eraserBtn");
         const clearBtn = document.getElementById("clearBtn");
         const saveBtn = document.getElementById("saveBtn");
 
@@ -50,6 +59,7 @@
         ctx.lineCap = "round";
 
         let isDrawing = false;
+        let isErasing = false;
 
         canvas.addEventListener("mousedown", () => isDrawing = true);
         canvas.addEventListener("mouseup", () =>{ isDrawing = false; ctx.beginPath(); });
@@ -60,6 +70,12 @@
         function draw(e)
         {
             if(!isDrawing) return;
+
+            if(isErasing){
+                ctx.strokeStyle = "#ffffff";
+            } else {
+                ctx.strokeStyle = colorPicker.value;
+            }
 
             ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
@@ -73,6 +89,18 @@
 
         brushSize.addEventListener("input", ()=>{
             ctx.lineWidth = brushSize.value;
+        })
+
+        brushBtn.addEventListener("click", ()=>{
+            isErasing = false;
+            brushBtn.classList.add("active");
+            eraserBtn.classList.remove("active");
+        })
+
+        eraserBtn.addEventListener("click", ()=>{
+            isErasing = true;
+            eraserBtn.classList.add("active");
+            brushBtn.classList.remove("active");
         })
 
         clearBtn.addEventListener("click", ()=>{
