@@ -13,6 +13,13 @@
             margin: 0;
             background: #f0f0f0;
         }
+
+        .toolbar{
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
         canvas{
             border: 2px solid black;
             background: white;
@@ -21,11 +28,20 @@
     </style>
 </head>
 <body>
+    <div id="toolbar">
+        <label>Color: <input type="color" id="colorPicker" value="#000000"></label>
+        <label>Brush Size: <input type="range" id="brushSize" min="1" max="30"></label>
+        <button id="clearBtn">Clear</button>
+    </div>
     <canvas id="draw" width="800" height="500"></canvas>
 
     <script>
         const canvas = document.getElementById("draw");
         const ctx = canvas.getContext("2d");
+
+        const colorPicker = document.getElementById("colorPicker");
+        const brushSize = document.getElementById("brushSize");
+        const clearBtn = document.getElementById("clearBtn");
 
         ctx.strokeStyle = "black";
         ctx.lineWidth = 3;
@@ -34,7 +50,7 @@
         let isDrawing = false;
 
         canvas.addEventListener("mousedown", () => isDrawing = true);
-        canvas.addEventListener("mouseup", () => isDrawing = false);
+        canvas.addEventListener("mouseup", () =>{ isDrawing = false; ctx.beginPath(); });
         canvas.addEventListener("mouseout", () => isDrawing = false);
 
         canvas.addEventListener("mousemove", draw);
@@ -48,6 +64,18 @@
             ctx.beginPath();
             ctx.moveTo(e.offsetX, e.offsetY);
         }
+
+        colorPicker.addEventListener("input", ()=>{
+            ctx.strokeStyle = colorPicker.value;
+        })
+
+        brushSize.addEventListener("input", ()=>{
+            ctx.lineWidth = brushSize.value;
+        })
+
+        clearBtn.addEventListener("click", ()=>{
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        })
 
     </script>
 </body>
