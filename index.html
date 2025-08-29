@@ -120,8 +120,9 @@
             brushBtn.classList.remove("active");
         })
 
-        undoBtn.addEventListener("click", ()=>{
-            if(undoStack.length > 0) {
+        function undo()
+        {
+             if(undoStack.length > 0) {
                 redoStack.push(canvas.toDataURL());
                 let lastState = undoStack.pop();
                 let img = new Image();
@@ -131,9 +132,10 @@
                     ctx.drawImage(img, 0, 0);
                 }
             }
-        })
+        }
 
-        redoBtn.addEventListener("click", ()=>{
+        function redo()
+        {
             if(redoStack.length > 0){
                 undoStack.push(canvas.toDataURL());
                 let nextState = redoStack.pop();
@@ -144,6 +146,14 @@
                     ctx.drawImage(img, 0, 0);
                 }
             }
+        }
+
+        undoBtn.addEventListener("click", ()=>{
+            undo();
+        })
+
+        redoBtn.addEventListener("click", ()=>{
+            redo();
         })
 
         clearBtn.addEventListener("click", ()=>{
@@ -155,6 +165,16 @@
             link.download = "drawing.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
+        })
+
+        document.addEventListener("keydown", (e)=>{
+            if(e.ctrlKey && e.key === "z"){
+                e.preventDefault();
+                undo();
+            } else if (e.ctrlKey && e.key === "y") {
+                e.preventDefault();
+                redo();
+            }
         })
 
     </script>
